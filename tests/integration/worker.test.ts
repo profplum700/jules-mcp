@@ -259,6 +259,9 @@ async function authoriseOAuth() {
   const start = await dispatch(`/authorize?${query}`);
   expect(start.status).toBe(200);
   expect(start.headers.get('referrer-policy')).toBe('strict-origin');
+  expect(start.headers.get('content-security-policy')).toBe(
+    "default-src 'none'; style-src 'unsafe-inline'; form-action 'self' https://github.com; base-uri 'none'; frame-ancestors 'none'",
+  );
   const cookie = start.headers.get('set-cookie')!.split(';')[0];
   const html = await start.text();
   const transaction = html.match(/name="transaction" value="([^"]+)"/)![1];
@@ -269,6 +272,7 @@ async function authoriseOAuth() {
   });
   expect(consent.status).toBe(302);
   expect(consent.headers.get('referrer-policy')).toBe('no-referrer');
+  expect(consent.headers.get('content-security-policy')).toContain("form-action 'self';");
   const state = new URL(consent.headers.get('location')!).searchParams.get('state')!;
   replyOnce('https://github.com/login/oauth/access_token', 'POST', { access_token: 'synthetic-login-token' });
   replyOnce('https://api.github.com/user', 'GET', { id: 12345 });

@@ -66,12 +66,11 @@ function cookieValue(request: Request): string {
   requireThat(/^[A-Za-z0-9_-]{43}$/.test(value), 'OAUTH_INVALID_REQUEST');
   return value;
 }
-function secureHeaders(extra: Record<string, string> = {}) {
+function secureHeaders(extra: Record<string, string> = {}, allowGithubRedirect = false) {
   return {
     'Cache-Control': 'no-store',
     'Referrer-Policy': 'no-referrer',
-    'Content-Security-Policy':
-      "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",
+    'Content-Security-Policy': `default-src 'none'; style-src 'unsafe-inline'; form-action 'self'${allowGithubRedirect ? ' https://github.com' : ''}; base-uri 'none'; frame-ancestors 'none'`,
     'X-Content-Type-Options': 'nosniff',
     ...extra,
   };
@@ -148,7 +147,11 @@ export async function ownerLogin(request: Request, ctx: LoginContext): Promise<R
     );
     const body = `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Connect to Jules</title><body><main><h1>Connect to Jules</h1><p><strong>${escapeHtml(client.clientName ?? 'Registered client')}</strong> requests ${escapeHtml(scopes.join(', '))}.</p><p>This grants access to all repositories and sessions in your Jules account. Control access includes creating tasks, messaging, approving plans and deleting sessions. Your client may also ask for action confirmations.</p><form method="post" action="/consent"><input type="hidden" name="transaction" value="${id}"><button name="decision" value="allow">Continue with GitHub</button><button name="decision" value="deny">Deny</button></form></main></body></html>`;
     return new Response(body, {
-      headers: secureHeaders({ 'Content-Type': 'text/html; charset=utf-8', 'Set-Cookie': cookie(secret) }),
+      // Browsers apply form-action to the POST's redirect chain as well as /consent.
+      headers: secureHeaders(
+        { 'Content-Type': 'text/html; charset=utf-8', 'Set-Cookie': cookie(secret) },
+        true,
+      ),
     });
   }
   if (url.pathname === '/consent' && request.method === 'POST') {
