@@ -235,6 +235,37 @@ describe('stateless Worker / SDK protocol integration', () => {
     expect(read.data.result.structuredContent.nonceFound).toBe(true);
     expect(fetchSpy).not.toHaveBeenCalled();
   });
+  it('Stage-0 shared schemas preserve repeated validation and concurrent credential isolation', async () => {
+    delete bindings.JULES_API_KEY;
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+    const call = (token: string, name: string, args: unknown) =>
+      rpc(token, 'tools/call', { name: `jules_feasibility_${name}`, arguments: args }, diagnostic);
+    expect((await call(tokenA, 'read', {})).data.result.isError).not.toBe(true);
+    const written = await call(tokenA, 'write', {});
+    const nonce = written.data.result.structuredContent.nonce;
+    for (const args of [{ nonce: 'short' }, { nonce: 123 }, { unexpected: true }])
+      expect((await call(tokenA, 'read', args)).data.result.isError).toBe(true);
+    const before = await bindings.OAUTH_KV.list({ prefix: 'diagnostic:' });
+    expect((await call(tokenA, 'write', { unexpected: true })).data.result.isError).toBe(true);
+    const registry = JSON.parse(bindings.SERVICE_TOKENS_JSON);
+    registry[1].scopes = ['jules:read'];
+    bindings.SERVICE_TOKENS_JSON = JSON.stringify(registry);
+    expect((await call(tokenB, 'write', {})).data.result.isError).toBe(true);
+    expect((await bindings.OAUTH_KV.list({ prefix: 'diagnostic:' })).keys).toEqual(before.keys);
+    const [a, b] = await Promise.all([call(tokenA, 'read', { nonce }), call(tokenB, 'read', { nonce })]);
+    expect(a.data.result.structuredContent).toMatchObject({
+      nonceFound: true,
+      principal: { clientId: 'alpha' },
+      productionGateway: false,
+    });
+    expect(b.data.result.structuredContent).toMatchObject({
+      nonceFound: false,
+      principal: { clientId: 'beta', scopes: ['jules:read'] },
+      productionGateway: false,
+    });
+    expect((await call(tokenA, 'write', {})).data.result.structuredContent.nonce).toHaveLength(43);
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
 });
 async function authoriseOAuth(redirectUri = 'https://client.example.test/callback') {
   const created = await adminCall({

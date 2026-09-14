@@ -6,6 +6,15 @@ import { createWorker } from './platform/worker.ts';
 import { requireScope } from './auth/principal.ts';
 import { requireThat } from './shared/errors.ts';
 import { randomSecret } from './shared/crypto.ts';
+
+const readInputSchema = z.strictObject({
+  nonce: z
+    .string()
+    .regex(/^[A-Za-z0-9_-]{43}$/)
+    .optional(),
+});
+const writeInputSchema = z.strictObject({});
+
 export default createWorker(async (request, env, ctx, context, config) => {
   const handler = createMcpHandler(
     () => {
@@ -15,12 +24,7 @@ export default createWorker(async (request, env, ctx, context, config) => {
         {
           description:
             'Stage-0 diagnostic: read verified identity and, optionally, an ephemeral nonce. Never calls Jules.',
-          inputSchema: z.strictObject({
-            nonce: z
-              .string()
-              .regex(/^[A-Za-z0-9_-]{43}$/)
-              .optional(),
-          }),
+          inputSchema: readInputSchema,
           annotations: {
             readOnlyHint: true,
             destructiveHint: false,
@@ -49,7 +53,7 @@ export default createWorker(async (request, env, ctx, context, config) => {
         {
           description:
             'Stage-0 benign write: stores only a random diagnostic nonce in authentication KV for 120 seconds. No repository, Jules task, or source code is touched.',
-          inputSchema: z.strictObject({}),
+          inputSchema: writeInputSchema,
           annotations: {
             readOnlyHint: false,
             destructiveHint: false,
