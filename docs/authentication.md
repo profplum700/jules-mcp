@@ -62,7 +62,7 @@ node scripts/oauth-admin.mjs create-client chatgpt "$CHATGPT_REDIRECT_URI" clien
 
 The generated client record (including any client secret) is saved in a private local JSON file, not printed. Enter its credentials in the hosted client’s own trusted configuration UI. The two OAuth applications are different: GitHub identifies the owner; the registered MCP client authenticates ChatGPT to this gateway.
 
-Use `client_secret_basic` or `none` only when the actual client requires it. All authorization-code connections still require S256. Registration accepts one exact HTTPS redirect per client; no wildcard callbacks, arbitrary metadata document fetching or open dynamic registration. Loopback-only OAuth clients can use independent service credentials instead in this prototype. Add support only from a verified client need.
+Use `client_secret_basic` or `none` only when the actual client requires it. All authorization-code connections still require S256. Each client registers one exact HTTPS redirect. Authorization additionally requires a concrete DNS hostname (including punycode) and supports explicit numeric HTTPS ports; wildcard or delimiter-bearing hosts, IPv6 literals, userinfo and fragments are rejected before consent. The consent CSP includes only the selected registered origin, GitHub and self. Arbitrary metadata document fetching and open dynamic registration remain disabled. Loopback-only OAuth clients can use independent service credentials instead in this prototype. Add support only from a verified client need.
 
 One connection consent screen is not a per-action approval queue. After authentication, control clients invoke supported actions directly, subject only to the host’s own confirmation policy.
 

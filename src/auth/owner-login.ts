@@ -137,7 +137,13 @@ export async function ownerLogin(request: Request, ctx: LoginContext): Promise<R
     // query input into CSP: the browser also checks the returning-user redirect chain.
     const registeredRedirect = new URL(auth.redirectUri);
     requireThat(
-      registeredRedirect.protocol === 'https:' && !/[\s;*]/.test(registeredRedirect.origin),
+      registeredRedirect.protocol === 'https:' &&
+        !registeredRedirect.username &&
+        !registeredRedirect.password &&
+        !registeredRedirect.hash &&
+        registeredRedirect.hostname
+          .split('.')
+          .every((label) => /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/i.test(label)),
       'OAUTH_INVALID_REQUEST',
     );
     const id = randomSecret();

@@ -236,11 +236,11 @@ describe('stateless Worker / SDK protocol integration', () => {
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 });
-async function authoriseOAuth() {
+async function authoriseOAuth(redirectUri = 'https://client.example.test/callback') {
   const created = await adminCall({
     action: 'create-client',
     name: 'Synthetic hosted client',
-    redirectUri: 'https://client.example.test/callback',
+    redirectUri,
     tokenEndpointAuthMethod: 'none',
   });
   expect(created.status).toBe(200);
@@ -249,7 +249,7 @@ async function authoriseOAuth() {
   const query = new URLSearchParams({
     client_id: client.clientId,
     response_type: 'code',
-    redirect_uri: 'https://client.example.test/callback',
+    redirect_uri: redirectUri,
     resource: `${origin}/mcp`,
     scope: 'jules:read jules:control',
     state: 'client-state',
@@ -260,7 +260,7 @@ async function authoriseOAuth() {
   expect(start.status).toBe(200);
   expect(start.headers.get('referrer-policy')).toBe('strict-origin');
   expect(start.headers.get('content-security-policy')).toBe(
-    "default-src 'none'; style-src 'unsafe-inline'; form-action 'self' https://github.com https://client.example.test; base-uri 'none'; frame-ancestors 'none'",
+    `default-src 'none'; style-src 'unsafe-inline'; form-action 'self' https://github.com ${new URL(redirectUri).origin}; base-uri 'none'; frame-ancestors 'none'`,
   );
   for (const unregisteredRedirect of [
     'https://untrusted.example.test/callback',
@@ -292,7 +292,10 @@ async function authoriseOAuth() {
     headers: { Cookie: cookie },
   });
   expect(callback.status).toBe(302);
+  expect(callback.headers.get('content-security-policy')).toContain("form-action 'self';");
+  expect(callback.headers.get('referrer-policy')).toBe('no-referrer');
   return {
+    authorizationPolicy: start.headers.get('content-security-policy')!,
     clientId: client.clientId,
     code: new URL(callback.headers.get('location')!).searchParams.get('code')!,
     verifier,
@@ -309,7 +312,11 @@ describe('real maintained OAuth-provider integration with mocked GitHub identity
   it('rejects registered redirect origins with CSP wildcard or directive delimiters', async () => {
     for (const redirectUri of [
       'https://*.example.test/callback',
+      'https://%2a.example.test/callback',
+      'https://*/callback',
       'https://host;name.example.test/callback',
+      'https://host,name.example.test/callback',
+      "https://host'name.example.test/callback",
     ]) {
       const created = await adminCall({
         action: 'create-client',
@@ -333,7 +340,18 @@ describe('real maintained OAuth-provider integration with mocked GitHub identity
       expect(rejected.status).toBe(400);
       expect(rejected.headers.has('set-cookie')).toBe(false);
       expect(rejected.headers.has('content-security-policy')).toBe(false);
+      expect(rejected.headers.has('location')).toBe(false);
     }
+  });
+  it('limits consent destinations to the selected registered origin and preserves an explicit port', async () => {
+    const first = await authoriseOAuth('https://first.example.test:8443/callback?fixed=synthetic');
+    const second = await authoriseOAuth('https://second.example.test/another-callback');
+    expect(first.authorizationPolicy).toContain('https://first.example.test:8443;');
+    expect(first.authorizationPolicy).not.toContain('second.example.test');
+    expect(first.authorizationPolicy).not.toContain('callback');
+    expect(first.authorizationPolicy).not.toContain('fixed');
+    expect(second.authorizationPolicy).toContain('https://second.example.test;');
+    expect(second.authorizationPolicy).not.toContain('first.example.test');
   });
   it('continues rejecting null and foreign consent origins', async () => {
     for (const originHeader of ['null', 'https://untrusted.example.test']) {
