@@ -260,8 +260,20 @@ async function authoriseOAuth() {
   expect(start.status).toBe(200);
   expect(start.headers.get('referrer-policy')).toBe('strict-origin');
   expect(start.headers.get('content-security-policy')).toBe(
-    "default-src 'none'; style-src 'unsafe-inline'; form-action 'self' https://github.com; base-uri 'none'; frame-ancestors 'none'",
+    "default-src 'none'; style-src 'unsafe-inline'; form-action 'self' https://github.com https://client.example.test; base-uri 'none'; frame-ancestors 'none'",
   );
+  for (const unregisteredRedirect of [
+    'https://untrusted.example.test/callback',
+    'https://client.example.test/unregistered',
+  ]) {
+    const invalidQuery = new URLSearchParams(query);
+    invalidQuery.set('redirect_uri', unregisteredRedirect);
+    const rejected = await dispatch(`/authorize?${invalidQuery}`);
+    expect(rejected.status).toBe(400);
+    expect(rejected.headers.has('location')).toBe(false);
+    expect(rejected.headers.has('set-cookie')).toBe(false);
+    expect(rejected.headers.get('content-security-policy') ?? '').not.toContain('untrusted.example.test');
+  }
   const cookie = start.headers.get('set-cookie')!.split(';')[0];
   const html = await start.text();
   const transaction = html.match(/name="transaction" value="([^"]+)"/)![1];
@@ -294,6 +306,35 @@ async function exchange(values: Record<string, string>) {
   });
 }
 describe('real maintained OAuth-provider integration with mocked GitHub identity', () => {
+  it('rejects registered redirect origins with CSP wildcard or directive delimiters', async () => {
+    for (const redirectUri of [
+      'https://*.example.test/callback',
+      'https://host;name.example.test/callback',
+    ]) {
+      const created = await adminCall({
+        action: 'create-client',
+        name: 'Synthetic malformed CSP host',
+        redirectUri,
+        tokenEndpointAuthMethod: 'none',
+      });
+      expect(created.status).toBe(200);
+      const { clientId } = (await created.json()) as { clientId: string };
+      const query = new URLSearchParams({
+        client_id: clientId,
+        response_type: 'code',
+        redirect_uri: redirectUri,
+        resource: `${origin}/mcp`,
+        scope: 'jules:read',
+        state: 'synthetic-state',
+        code_challenge: 'A'.repeat(43),
+        code_challenge_method: 'S256',
+      });
+      const rejected = await dispatch(`/authorize?${query}`);
+      expect(rejected.status).toBe(400);
+      expect(rejected.headers.has('set-cookie')).toBe(false);
+      expect(rejected.headers.has('content-security-policy')).toBe(false);
+    }
+  });
   it('continues rejecting null and foreign consent origins', async () => {
     for (const originHeader of ['null', 'https://untrusted.example.test']) {
       const response = await dispatch('/consent', {

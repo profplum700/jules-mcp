@@ -66,11 +66,11 @@ function cookieValue(request: Request): string {
   requireThat(/^[A-Za-z0-9_-]{43}$/.test(value), 'OAUTH_INVALID_REQUEST');
   return value;
 }
-function secureHeaders(extra: Record<string, string> = {}, allowGithubRedirect = false) {
+function secureHeaders(extra: Record<string, string> = {}, registeredRedirectOrigin?: string) {
   return {
     'Cache-Control': 'no-store',
     'Referrer-Policy': 'no-referrer',
-    'Content-Security-Policy': `default-src 'none'; style-src 'unsafe-inline'; form-action 'self'${allowGithubRedirect ? ' https://github.com' : ''}; base-uri 'none'; frame-ancestors 'none'`,
+    'Content-Security-Policy': `default-src 'none'; style-src 'unsafe-inline'; form-action 'self'${registeredRedirectOrigin ? ` https://github.com ${registeredRedirectOrigin}` : ''}; base-uri 'none'; frame-ancestors 'none'`,
     'X-Content-Type-Options': 'nosniff',
     ...extra,
   };
@@ -132,7 +132,14 @@ export async function ownerLogin(request: Request, ctx: LoginContext): Promise<R
   const url = new URL(request.url);
   if (url.pathname === '/authorize' && request.method === 'GET') {
     requireThat(request.url.length <= 8192, 'OAUTH_INVALID_REQUEST');
-    const { client, scopes } = await checkedAuth(request.url, ctx);
+    const { auth, client, scopes } = await checkedAuth(request.url, ctx);
+    // checkedAuth accepted this exact owner-registered redirect. Never serialize raw
+    // query input into CSP: the browser also checks the returning-user redirect chain.
+    const registeredRedirect = new URL(auth.redirectUri);
+    requireThat(
+      registeredRedirect.protocol === 'https:' && !/[\s;*]/.test(registeredRedirect.origin),
+      'OAUTH_INVALID_REQUEST',
+    );
     const id = randomSecret();
     const secret = randomSecret();
     await ctx.store.put(
@@ -150,7 +157,7 @@ export async function ownerLogin(request: Request, ctx: LoginContext): Promise<R
       // Browsers apply form-action to the POST's redirect chain as well as /consent.
       headers: secureHeaders(
         { 'Content-Type': 'text/html; charset=utf-8', 'Set-Cookie': cookie(secret) },
-        true,
+        registeredRedirect.origin,
       ),
     });
   }

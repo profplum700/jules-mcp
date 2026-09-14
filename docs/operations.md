@@ -14,7 +14,7 @@ If the Jules key is compromised, revoke/rotate it directly in Google’s trusted
 
 Record the deployed commit and Cloudflare version after each deployment. GitHub Actions’ validated triggering SHA and Wrangler’s `commit:SHA` version message provide traceability. For code rollback use Cloudflare’s version/deployment interface to select a known-good prior deployment. Verify the runtime secret set and bindings as well: code rollback is not an assertion that secrets or KV grant state have been rolled back. Do not restore a compromised credential registry.
 
-Exercise rollback first on the separate feasibility deployment. In this delivery it has not been exercised and no known-good deployed version exists. Do not tag a production release based solely on a generated configuration or dry run.
+Exercise rollback first on the separate feasibility deployment. The isolated Stage-0 disable/version-rollback rehearsal is recorded in implementation-status.md: protected access was disabled, then the previously verified version restored SDK access while revoked credentials remained denied. Do not tag a production release based solely on a generated configuration or dry run.
 
 ## Limits and failure behaviour
 
