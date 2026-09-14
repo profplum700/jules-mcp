@@ -212,7 +212,9 @@ describe('stateless Worker / SDK protocol integration', () => {
       ).status,
     ).toBe(403);
   });
-  it('Stage-0 exposes benign read/write only, production does not', async () => {
+  it('Stage-0 discovers, writes and reads without a Jules key or outbound HTTP', async () => {
+    delete bindings.JULES_API_KEY;
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
     const tools = await rpc(tokenA, 'tools/list', {}, diagnostic);
     expect(tools.data.result.tools).toHaveLength(2);
     const written = await rpc(
@@ -229,6 +231,7 @@ describe('stateless Worker / SDK protocol integration', () => {
       diagnostic,
     );
     expect(read.data.result.structuredContent.nonceFound).toBe(true);
+    expect(fetchSpy).not.toHaveBeenCalled();
   });
 });
 async function authoriseOAuth() {
@@ -283,6 +286,32 @@ async function exchange(values: Record<string, string>) {
   });
 }
 describe('real maintained OAuth-provider integration with mocked GitHub identity', () => {
+  it('does not disguise authorization storage failures as invalid client input', async () => {
+    vi.spyOn(bindings.OAUTH_KV, 'get').mockRejectedValueOnce(new Error('synthetic-private-storage-error'));
+    const response = await dispatch('/authorize?client_id=synthetic-client');
+    expect(response.status).toBe(500);
+    const body = await response.text();
+    expect(JSON.parse(body).error.code).toBe('INTERNAL_ERROR');
+    expect(body).not.toContain('synthetic-private-storage-error');
+  });
+  it('rejects an unknown authorization client without an internal error or reflected input', async () => {
+    const query = new URLSearchParams({
+      client_id: 'unknown-synthetic-client',
+      response_type: 'code',
+      redirect_uri: 'https://untrusted.example.test/callback',
+      resource: `${origin}/mcp`,
+      scope: 'jules:read',
+      code_challenge: 'A'.repeat(43),
+      code_challenge_method: 'S256',
+    });
+    const response = await dispatch(`/authorize?${query}`);
+    expect(response.status).toBe(400);
+    expect(response.headers.has('location')).toBe(false);
+    const body = await response.text();
+    expect(JSON.parse(body).error.code).toBe('OAUTH_INVALID_REQUEST');
+    expect(body).not.toContain('unknown-synthetic-client');
+    expect(body).not.toContain('untrusted.example.test');
+  });
   it('exchanges S256 code, calls MCP, refreshes with downscope, and revokes grant', async () => {
     const auth = await authoriseOAuth();
     const response = await exchange({

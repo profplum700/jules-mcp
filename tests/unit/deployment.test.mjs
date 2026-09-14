@@ -30,6 +30,14 @@ for (const key of Object.keys(vars))
   });
 test('Stage-0 diagnostic entrypoint cannot replace production accidentally', () => {
   assert.throws(() => renderConfig(base, { ...vars, GATEWAY_MODE: 'feasibility' }));
+  assert.throws(
+    () => renderConfig(base, { ...vars, GATEWAY_MODE: 'production', WORKER_NAME: 'example-feasibility' }),
+    /Production cannot overwrite/,
+  );
+  assert.throws(
+    () => renderConfig(base, { ...vars, WORKER_NAME: 'example-feasibility' }),
+    /Production cannot overwrite/,
+  );
   const c = renderConfig(base, { ...vars, GATEWAY_MODE: 'feasibility', WORKER_NAME: 'example-feasibility' });
   assert.equal(c.main, '../src/feasibility.ts');
 });

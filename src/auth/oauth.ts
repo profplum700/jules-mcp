@@ -1,9 +1,9 @@
-import { OAuthProvider } from '@cloudflare/workers-oauth-provider';
+import { AuthorizationError, OAuthProvider } from '@cloudflare/workers-oauth-provider';
 import { assertPrincipal, parseScopes, SCOPES } from './principal.ts';
 import { verifyServiceToken } from './service-tokens.ts';
 import { ownerLogin } from './owner-login.ts';
 import { oauthAdmin } from './admin.ts';
-import { requireThat } from '../shared/errors.ts';
+import { GatewayError, requireThat } from '../shared/errors.ts';
 import type { Env } from '../platform/cloudflare.ts';
 import type { SecurityConfig } from '../platform/config.ts';
 import type { RequestBudget } from '../shared/limits.ts';
@@ -36,7 +36,18 @@ export function oauthProvider(
       async fetch(request, env) {
         if (new URL(request.url).pathname === '/admin')
           return oauthAdmin(request, env.OAUTH_PROVIDER, config, budget);
-        return ownerLogin(request, { config, api: env.OAUTH_PROVIDER, store: env.OAUTH_KV, budget });
+        try {
+          return await ownerLogin(request, { config, api: env.OAUTH_PROVIDER, store: env.OAUTH_KV, budget });
+        } catch (error) {
+          // Provider validation errors are caller errors. Never reflect their details or redirect URI.
+          if (
+            error instanceof AuthorizationError &&
+            error.code !== 'server_error' &&
+            error.code !== 'temporarily_unavailable'
+          )
+            throw new GatewayError('OAUTH_INVALID_REQUEST', 400);
+          throw error;
+        }
       },
     },
     async resolveExternalToken({ token }) {

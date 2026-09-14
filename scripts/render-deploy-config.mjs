@@ -8,6 +8,8 @@ export function renderConfig(base, env) {
   if (!/^[a-z][a-z0-9-]{2,62}$/.test(env.WORKER_NAME ?? '')) throw new Error('Set WORKER_NAME.');
   if (mode === 'feasibility' && !env.WORKER_NAME.endsWith('-feasibility'))
     throw new Error('Stage 0 requires a separate name ending in -feasibility.');
+  if (mode === 'production' && env.WORKER_NAME.endsWith('-feasibility'))
+    throw new Error('Production cannot overwrite a Stage-0 Worker.');
   if (!/^[a-f0-9]{32}$/.test(env.OAUTH_KV_NAMESPACE_ID ?? ''))
     throw new Error('Set a real OAUTH_KV_NAMESPACE_ID.');
   if (env.OAUTH_KV_NAMESPACE_ID === '0'.repeat(32)) throw new Error('Placeholder KV ID cannot deploy.');

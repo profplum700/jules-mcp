@@ -54,6 +54,7 @@ jobs:
           GATEWAY_MODE: ${{ inputs.target }}
           WORKER_NAME: ${{ vars.WORKER_NAME }}
           PUBLIC_ORIGIN: ${{ vars.PUBLIC_ORIGIN }}
+          ALLOWED_ORIGINS_JSON: ${{ vars.ALLOWED_ORIGINS_JSON || '[]' }}
           OAUTH_KV_NAMESPACE_ID: ${{ secrets.OAUTH_KV_NAMESPACE_ID }}
           RATE_AUTH_NAMESPACE_ID: ${{ vars.RATE_AUTH_NAMESPACE_ID }}
           RATE_READ_NAMESPACE_ID: ${{ vars.RATE_READ_NAMESPACE_ID }}

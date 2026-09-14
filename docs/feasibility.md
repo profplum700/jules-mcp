@@ -2,7 +2,9 @@
 
 ## Current evidence
 
-The transport and maintained OAuth integrations have been implemented from current source/documentation. The dependency-free owner-login adapter passes synthetic tests. The official SDK/provider now pass local Workerd and SDK-client tests; no Worker has been deployed and no actual ChatGPT connection has been authorised. Stage 0 therefore remains **open**, not passed and not disproved.
+The transport and maintained OAuth integrations pass local Workerd and SDK-client tests. The isolated diagnostic Worker is now deployed on a confirmed Workers Free account with dedicated auth KV and all three native rate-limit bindings. Owner-login secrets are deployed; a bounded confidential-client trial is enabled. Live SDK and actual Codex CLI diagnostic write/read-back succeeded. ChatGPT discovered OAuth endpoints, resource and scopes; owner connection is pending. Stage 0 remains **open**, not passed and not disproved.
+
+The real Pro web account exposes Create app, user-defined OAuth client credentials, client_secret_basic/client_secret_post, scope fields and a generated callback URL. Live discovery is observed, but successful ChatGPT gateway authentication and writes remain unverified. The existing Workerd diagnostic test now removes JULES_API_KEY and asserts zero outbound HTTP during tool discovery, nonce write and read-back.
 
 OpenAI’s developer-mode documentation describes full MCP reads/writes for Pro web accounts, while its Help Center still describes Pro custom MCP as read/fetch-only. Both were checked on 14 September 2026. A practical account test is necessary. The UI can change; do not infer a hidden bearer-header field from Codex/API configuration.
 

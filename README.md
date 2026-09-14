@@ -2,7 +2,7 @@
 
 An independent, self-hostable remote MCP gateway for one Google Jules account. It targets Cloudflare Workers **Free**, with a small authentication KV namespace and no task database or always-on server.
 
-**Validation status:** all 13 tools are implemented. Real dependencies are installed and locked; formatting, policy lint, full TypeScript checking, unit/contract tests, Worker-runtime OAuth/MCP integration, schema checks, dependency audit and both Wrangler dry runs pass locally. **Not deployed or verified in ChatGPT.** See [implementation status](docs/implementation-status.md) for exact evidence and remaining live gates.
+**Validation status:** all 13 tools are implemented. Real dependencies are installed and locked; formatting, policy lint, full TypeScript checking, unit/contract tests, Worker-runtime OAuth/MCP integration, schema checks, dependency audit and both Wrangler dry runs pass locally. **The isolated Stage-0 Worker is deployed on Workers Free. Live SDK and Codex CLI diagnostic write/read-back passed; ChatGPT OAuth discovery succeeded, with owner connection still pending. Production remains unverified.** See [implementation status](docs/implementation-status.md) for exact evidence and remaining live gates.
 
 ## What it does
 

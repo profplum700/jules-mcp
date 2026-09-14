@@ -1,6 +1,6 @@
 # Deployment: GitHub Actions → Wrangler → Workers Free
 
-No live deployment exists in the delivered prototype. Do not skip the dependency and Stage-0 gates. All provider sign-in, app registration, consent and secret entry are owner actions; no token needs to be pasted into chat.
+The isolated Stage-0 Worker has been uploaded on Workers Free and enabled for a bounded confidential-client trial; production is not deployed. Do not skip the dependency and Stage-0 gates. Provider consent and private secret entry remain necessary; no token needs to be pasted into chat. See [current evidence](implementation-status.md).
 
 ## 1. Resolve and validate the dependency graph
 
@@ -37,7 +37,9 @@ Environment secrets are `CLOUDFLARE_ACCOUNT_ID`, `OAUTH_KV_NAMESPACE_ID` and a s
 
 Run **Deploy**, selecting `feasibility`, from `main`. It repeats validation first, then renders `.deploy/wrangler.json` with explicit private values and deploys the exact triggering commit. A configured deployment workflow is not evidence that a deployment has occurred.
 
-If Cloudflare rejects rate-limit bindings on the Free account, stop this release gate. Do not approve a paid upgrade or replace the limiter with an inaccurate global in-memory/KV counter. Account eligibility is explicitly still untested in this artifact.
+The initial Stage-0 bootstrap used the authorized Cloudflare plugin to upload Wrangler's exact dry-run multipart artifact because local Wrangler credentials had expired. This is an isolated diagnostic bootstrap, not a second production deployment route. With current Wrangler, `--outfile` contains the multipart upload body, not a JavaScript module: preserve its boundary and metadata when uploading through the API. The upload, bindings and workers.dev route were independently re-fetched. Production still requires the protected GitHub Actions route below.
+
+If Cloudflare rejects rate-limit bindings on the Free account, stop this release gate. Do not approve a paid upgrade or replace the limiter with an inaccurate global in-memory/KV counter. The initial Stage-0 account accepted all three bindings; each new deployment still requires its own eligibility check.
 
 ## 3. Enter owner-login and credential secrets
 
