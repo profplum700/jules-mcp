@@ -339,6 +339,7 @@ describe('real maintained OAuth-provider integration with mocked GitHub identity
     });
     const response = await dispatch(`/authorize?${query}`);
     expect(response.status).toBe(400);
+    expect(response.headers.get('referrer-policy')).toBe('no-referrer');
     expect(response.headers.has('location')).toBe(false);
     const body = await response.text();
     expect(JSON.parse(body).error.code).toBe('OAUTH_INVALID_REQUEST');
