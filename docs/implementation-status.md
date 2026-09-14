@@ -2,7 +2,7 @@
 
 Evidence date: 14 September 2026. Version: 0.1.0-prototype; no production release tag.
 
-**Stage 0 is deployed on Workers Free and enabled for a bounded confidential-client trial. Live SDK and Codex CLI diagnostic operations passed; ChatGPT OAuth login, tool discovery and diagnostic read/write/read-back passed. Production remains unverified.** Continued from current public main, `c6960f1486bc2616dd3e7f1f17a7856e09f35087`; no later public commits existed at inspection. Earlier implementation history remains in Git.
+**Stage-0 assessment is complete: NO-GO for advancement under the Workers Free CPU requirement.** Runtime `17d0a30f68254394a81946c0351403a8b0d83dbd` passed 192 core and 22 Workerd tests, Linux CI and actual ChatGPT/Codex diagnostic checks, but sampled CPU overruns remain. See the [final assessment and requirement audit](stage-zero-assessment.md). Production and Jules-key setup remain gated. The sections below retain the dated investigation history; earlier pending items are superseded by the final assessment. Continued from preserved public main `c6960f1486bc2616dd3e7f1f17a7856e09f35087`.
 
 ## Acceptance criteria and evidence
 

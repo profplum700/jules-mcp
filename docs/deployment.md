@@ -1,6 +1,6 @@
 # Deployment: GitHub Actions → Wrangler → Workers Free
 
-The isolated Stage-0 Worker has been uploaded on Workers Free and enabled for a bounded confidential-client trial; production is not deployed. Do not skip the dependency and Stage-0 gates. Provider consent and private secret entry remain necessary; no token needs to be pasted into chat. See [current evidence](implementation-status.md).
+The isolated Stage-0 Worker is deployed; its assessment concluded **no-go for advancement because of CPU overruns**. Owner consent and diagnostic secrets are already configured. Production is not deployed and remains gated; do not enter a Jules key. See the [assessment](stage-zero-assessment.md) and [current evidence](implementation-status.md).
 
 ## 1. Resolve and validate the dependency graph
 
@@ -49,7 +49,7 @@ Generate admin/client credentials locally using the included scripts. No secret 
 
 After secrets are in place, set the environment variable `GATEWAY_DISABLED=false` and run **Deploy** again. The `--message` records the exact commit in Cloudflare’s version history. Runtime secrets are not sent from PR workflows and are not overwritten by the generic renderer.
 
-Pre-register ChatGPT with the exact redirect URI supplied by its current UI, enter that client’s static OAuth credentials in that UI and perform the [Stage-0 trial](feasibility.md). Owner authorization is the remaining human interaction; it cannot be inferred from a passing local OAuth test.
+For a new deployment, pre-register ChatGPT with the exact redirect URI supplied by its current UI, enter that client’s static OAuth credentials in that UI and perform the [Stage-0 trial](feasibility.md). Owner authorization must be observed in the actual client. It was completed for the assessed diagnostic deployment.
 
 ## 4. Production only after Stage 0 passes
 

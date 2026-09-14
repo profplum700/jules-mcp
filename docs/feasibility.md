@@ -2,7 +2,7 @@
 
 ## Current evidence
 
-The transport and maintained OAuth integrations pass local Workerd and SDK-client tests. The isolated diagnostic Worker is now deployed on a confirmed Workers Free account with dedicated auth KV and all three native rate-limit bindings. Owner-login secrets are deployed; a bounded confidential-client trial is enabled. Live SDK and actual Codex CLI diagnostic write/read-back succeeded. ChatGPT completed owner OAuth login, discovered both diagnostic tools and passed a read, single write and immediate nonce read-back. Stage 0 remains **open**, not passed and not disproved.
+**The Stage-0 assessment is complete with a no-go for advancement; feasibility has not passed.** The isolated diagnostic Worker is deployed on a confirmed Free account with dedicated auth KV and all three native limiters. Actual ChatGPT OAuth lifecycle and diagnostic read/write/read-back passed, as did Codex CLI diagnostics. CPU samples still exceed the Free target. See the [final assessment](stage-zero-assessment.md); the runbook below describes the trial procedure, not an instruction to repeat it or enter production secrets.
 
 The real Pro web account exposes Create app, user-defined OAuth client credentials, client_secret_basic/client_secret_post, scope fields and a generated callback URL. Live discovery, OAuth authentication and the benign diagnostic write/read-back are verified; natural-expiry refresh, revocation denial and returning-user reconnect passed; Free CPU qualification remains open. The existing Workerd diagnostic test now removes JULES_API_KEY and asserts zero outbound HTTP during tool discovery, nonce write and read-back.
 
