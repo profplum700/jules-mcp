@@ -101,11 +101,20 @@ export function createWorker(serve: McpAdapter) {
         const body = response.body
           ? await readLimited(response, config.limits.transportBytes, b, 'OUTPUT_TOO_LARGE')
           : null;
-        return secured(
+        const result = secured(
           new Response(body, { status: response.status, headers: response.headers }),
           id,
           responseOrigin,
         );
+        // no-referrer makes browser form POSTs send Origin: null. The consent page needs
+        // its exact origin, but must never disclose its OAuth query in a Referer header.
+        if (
+          request.method === 'GET' &&
+          new URL(request.url).pathname === '/authorize' &&
+          response.status === 200
+        )
+          result.headers.set('Referrer-Policy', 'strict-origin');
+        return result;
       } catch (error) {
         let e = safeError(error);
         // Only an outer failure AFTER dispatch makes the outcome unknowable to this caller.

@@ -258,6 +258,7 @@ async function authoriseOAuth() {
   });
   const start = await dispatch(`/authorize?${query}`);
   expect(start.status).toBe(200);
+  expect(start.headers.get('referrer-policy')).toBe('strict-origin');
   const cookie = start.headers.get('set-cookie')!.split(';')[0];
   const html = await start.text();
   const transaction = html.match(/name="transaction" value="([^"]+)"/)![1];
@@ -267,6 +268,7 @@ async function authoriseOAuth() {
     body: new URLSearchParams({ transaction, decision: 'allow' }),
   });
   expect(consent.status).toBe(302);
+  expect(consent.headers.get('referrer-policy')).toBe('no-referrer');
   const state = new URL(consent.headers.get('location')!).searchParams.get('state')!;
   replyOnce('https://github.com/login/oauth/access_token', 'POST', { access_token: 'synthetic-login-token' });
   replyOnce('https://api.github.com/user', 'GET', { id: 12345 });
@@ -288,6 +290,18 @@ async function exchange(values: Record<string, string>) {
   });
 }
 describe('real maintained OAuth-provider integration with mocked GitHub identity', () => {
+  it('continues rejecting null and foreign consent origins', async () => {
+    for (const originHeader of ['null', 'https://untrusted.example.test']) {
+      const response = await dispatch('/consent', {
+        method: 'POST',
+        headers: { Origin: originHeader, 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'decision=allow&transaction=synthetic',
+      });
+      expect(response.status).toBe(403);
+      expect(response.headers.get('referrer-policy')).toBe('no-referrer');
+      expect(response.headers.has('location')).toBe(false);
+    }
+  });
   it('preserves provider server failures, unexpected failures and existing gateway denials', async () => {
     const failures = [
       [
