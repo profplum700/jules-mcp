@@ -42,7 +42,7 @@ jobs:
           node-version: '22'
       - name: Require reviewed dependency lockfile
         run: |
-          test -f pnpm-lock.yaml || { echo 'Run the one-time Dependency bootstrap workflow and commit its reviewed lockfile/formatting patch. Deployment remains blocked.'; exit 1; }
+          test -f pnpm-lock.yaml || { echo 'Restore the reviewed pnpm lockfile or run the Dependency refresh workflow and review its changes. Deployment remains blocked.'; exit 1; }
       - run: npm install --global pnpm@10.13.1
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
