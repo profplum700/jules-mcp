@@ -1,0 +1,111 @@
+{
+  "baselineChecked": "2026-09-14",
+  "experimental": true,
+  "version": "v1alpha",
+  "tools": [
+    {
+      "tool": "jules_list_sources",
+      "method": "GET",
+      "resource": "sources",
+      "permission": "jules:read",
+      "contractTest": "tests/contract/tools.test.mjs",
+      "liveTested": false
+    },
+    {
+      "tool": "jules_get_source",
+      "method": "GET",
+      "resource": "sources/{source}",
+      "permission": "jules:read",
+      "contractTest": "tests/contract/tools.test.mjs",
+      "liveTested": false
+    },
+    {
+      "tool": "jules_resolve_repository",
+      "method": "DERIVED",
+      "resource": "GET sources + GET sources/{source}",
+      "permission": "jules:read",
+      "contractTest": "tests/contract/tools.test.mjs",
+      "liveTested": false
+    },
+    {
+      "tool": "jules_create_session",
+      "method": "POST",
+      "resource": "sessions",
+      "permission": "jules:control",
+      "contractTest": "tests/contract/tools.test.mjs",
+      "liveTested": false
+    },
+    {
+      "tool": "jules_list_sessions",
+      "method": "GET",
+      "resource": "sessions",
+      "permission": "jules:read",
+      "contractTest": "tests/contract/tools.test.mjs",
+      "liveTested": false
+    },
+    {
+      "tool": "jules_get_session",
+      "method": "GET",
+      "resource": "sessions/{session}",
+      "permission": "jules:read",
+      "contractTest": "tests/contract/tools.test.mjs",
+      "liveTested": false
+    },
+    {
+      "tool": "jules_delete_session",
+      "method": "DELETE",
+      "resource": "sessions/{session}",
+      "permission": "jules:control",
+      "contractTest": "tests/contract/tools.test.mjs",
+      "liveTested": false
+    },
+    {
+      "tool": "jules_send_message",
+      "method": "POST",
+      "resource": "sessions/{session}:sendMessage",
+      "permission": "jules:control",
+      "contractTest": "tests/contract/tools.test.mjs",
+      "liveTested": false
+    },
+    {
+      "tool": "jules_approve_plan",
+      "method": "POST",
+      "resource": "sessions/{session}:approvePlan",
+      "permission": "jules:control",
+      "contractTest": "tests/contract/tools.test.mjs",
+      "liveTested": false
+    },
+    {
+      "tool": "jules_list_activities",
+      "method": "GET",
+      "resource": "sessions/{session}/activities",
+      "permission": "jules:read",
+      "contractTest": "tests/contract/tools.test.mjs",
+      "liveTested": false
+    },
+    {
+      "tool": "jules_get_activity",
+      "method": "GET",
+      "resource": "sessions/{session}/activities/{activity}",
+      "permission": "jules:read",
+      "contractTest": "tests/contract/tools.test.mjs",
+      "liveTested": false
+    },
+    {
+      "tool": "jules_get_change_set",
+      "method": "DERIVED",
+      "resource": "GET activity -> artifacts[index].changeSet.gitPatch",
+      "permission": "jules:read",
+      "contractTest": "tests/contract/tools.test.mjs",
+      "liveTested": false
+    },
+    {
+      "tool": "jules_gateway_info",
+      "method": "LOCAL",
+      "resource": "authenticated public capabilities and own principal",
+      "permission": "jules:read",
+      "contractTest": "tests/contract/tools.test.mjs",
+      "liveTested": false
+    }
+  ]
+}

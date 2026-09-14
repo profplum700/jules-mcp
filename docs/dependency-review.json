@@ -1,0 +1,171 @@
+{
+  "checked": "2026-09-14",
+  "packages": [
+    {
+      "name": "@cloudflare/workers-oauth-provider",
+      "pinned": "0.10.3",
+      "latest": "0.10.3",
+      "selected": "0.10.3"
+    },
+    {
+      "name": "@modelcontextprotocol/server",
+      "pinned": "2.0.0",
+      "latest": "2.0.0",
+      "engines": {
+        "node": ">=20"
+      },
+      "selected": "2.0.0"
+    },
+    {
+      "name": "@modelcontextprotocol/client",
+      "pinned": "2.0.0",
+      "latest": "2.0.0",
+      "engines": {
+        "node": ">=20"
+      },
+      "selected": "2.0.0"
+    },
+    {
+      "name": "@modelcontextprotocol/sdk",
+      "pinned": "1.30.0",
+      "latest": "1.30.0",
+      "peers": {
+        "zod": "^3.25 || ^4.0",
+        "@cfworker/json-schema": "^4.1.1"
+      },
+      "engines": {
+        "node": ">=18"
+      },
+      "selected": "1.30.0"
+    },
+    {
+      "name": "agents",
+      "pinned": "0.23.0",
+      "latest": "0.23.0",
+      "peers": {
+        "ai": "^6.0.0 || ^7.0.0",
+        "zod": "^4.0.0",
+        "chat": "^4.29.0",
+        "vite": ">=6.0.0 <9.0.0",
+        "react": "^19.0.0",
+        "@x402/evm": "^2.0.0",
+        "just-bash": "^3.0.0",
+        "@x402/core": "^2.0.0",
+        "@tanstack/ai": ">=0.10.2 <1.0.0",
+        "@ai-sdk/react": "^3.0.0 || ^4.0.0",
+        "@cloudflare/codemode": ">=0.5.0",
+        "@modelcontextprotocol/sdk": "1.30.0",
+        "@modelcontextprotocol/client": "2.0.0",
+        "@modelcontextprotocol/server": "2.0.0"
+      },
+      "selected": "0.23.0"
+    },
+    {
+      "name": "zod",
+      "pinned": "4.5.4",
+      "latest": "4.6.5",
+      "selected": "4.6.5"
+    },
+    {
+      "name": "@cloudflare/vitest-plugin",
+      "pinned": "1.1.9",
+      "latest": "1.1.9",
+      "peers": {
+        "vitest": "^4.1.0",
+        "@vitest/runner": "^4.1.0",
+        "@vitest/snapshot": "^4.1.0"
+      },
+      "selected": "1.1.9"
+    },
+    {
+      "name": "@cloudflare/workers-types",
+      "pinned": "5.20260730.1",
+      "latest": "5.20260914.1",
+      "selected": "5.20260914.1"
+    },
+    {
+      "name": "@types/node",
+      "pinned": "22.15.30",
+      "latest": "26.5.1",
+      "peers": {},
+      "selected": "22.15.30"
+    },
+    {
+      "name": "@vitest/runner",
+      "pinned": "4.1.8",
+      "latest": "4.1.11",
+      "selected": "4.1.8"
+    },
+    {
+      "name": "@vitest/snapshot",
+      "pinned": "4.1.8",
+      "latest": "5.0.0",
+      "selected": "4.1.8"
+    },
+    {
+      "name": "prettier",
+      "pinned": "3.7.4",
+      "latest": "3.9.6",
+      "engines": {
+        "node": ">=14"
+      },
+      "selected": "3.9.6"
+    },
+    {
+      "name": "typescript",
+      "pinned": "6.0.3",
+      "latest": "7.0.2",
+      "engines": {
+        "node": ">=14.17"
+      },
+      "selected": "6.0.3"
+    },
+    {
+      "name": "vitest",
+      "pinned": "4.1.8",
+      "latest": "5.0.0",
+      "peers": {
+        "vite": "^6.0.0 || ^7.0.0 || ^8.0.0",
+        "jsdom": "*",
+        "happy-dom": "*",
+        "@vitest/ui": "4.1.8",
+        "@types/node": "^20.0.0 || ^22.0.0 || >=24.0.0",
+        "@edge-runtime/vm": "*",
+        "@opentelemetry/api": "^1.9.0",
+        "@vitest/coverage-v8": "4.1.8",
+        "@vitest/browser-preview": "4.1.8",
+        "@vitest/coverage-istanbul": "4.1.8",
+        "@vitest/browser-playwright": "4.1.8",
+        "@vitest/browser-webdriverio": "4.1.8"
+      },
+      "engines": {
+        "node": "^20.0.0 || ^22.0.0 || >=24.0.0"
+      },
+      "selected": "4.1.8"
+    },
+    {
+      "name": "wrangler",
+      "pinned": "4.115.0",
+      "latest": "4.131.2",
+      "peers": {
+        "@cloudflare/workers-types": "^5.20260722.1"
+      },
+      "engines": {
+        "node": ">=22.0.0"
+      },
+      "selected": "4.131.2"
+    },
+    {
+      "name": "@babel/core",
+      "selected": "8.0.5",
+      "reason": "Required strict peer of Agents decorator tooling, not imported by Worker."
+    }
+  ],
+  "notes": [
+    "MCP v2 server/client and legacy SDK versions match Agents 0.23.0 exact peers.",
+    "Cloudflare Vitest plugin 1.1.9 requires Vitest 4.1; do not upgrade to Vitest 5 until supported.",
+    "TypeScript 6.0.3 retained and tested; 7.0.2 exists but a compiler-major migration is not needed to validate the intended dependency graph.",
+    "Workers types and Wrangler aligned with the current test-plugin graph.",
+    "pnpm 10.13.1 is required; environment pnpm 11 uses different build policy settings."
+  ]
+}

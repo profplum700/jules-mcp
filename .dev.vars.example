@@ -1,0 +1,9 @@
+# Copy only into a gitignored private file. Never enter real values in chat or source control.
+# This example is deliberately not a working deployment or authentication configuration.
+OWNER_GITHUB_ID=REPLACE_WITH_STABLE_NUMERIC_GITHUB_USER_ID
+GITHUB_CLIENT_ID=REPLACE_IN_PROVIDER_INTERFACE
+GITHUB_CLIENT_SECRET=REPLACE_IN_PROVIDER_INTERFACE
+ADMIN_TOKEN_SHA256=REPLACE_WITH_GENERATED_VERIFIER
+SERVICE_TOKENS_JSON=[]
+# JULES_API_KEY is unnecessary for the separate Stage-0 entrypoint.
+JULES_API_KEY=REPLACE_IN_CLOUDFLARE_SECRET_INTERFACE

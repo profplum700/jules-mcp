@@ -1,0 +1,20 @@
+{
+  "testedAt": null,
+  "client": null,
+  "surface": null,
+  "clientVersion": null,
+  "accountOrWorkspaceType": null,
+  "authenticationMethod": null,
+  "commit": null,
+  "cloudflareVersion": null,
+  "toolDiscovery": "not-tested",
+  "read": "not-tested",
+  "benignWrite": "not-tested",
+  "reconnect": "not-tested",
+  "revocation": "not-tested",
+  "otherClientUnaffected": "not-tested",
+  "cpuColdMs": null,
+  "cpuWarmMs": null,
+  "safeLimitationNotes": [],
+  "secretsOrPersonalRepositoryDataIncluded": false
+}

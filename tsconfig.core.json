@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "strict": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "skipLibCheck": true,
+    "types": [],
+    "verbatimModuleSyntax": true
+  },
+  "include": [
+    "src/shared/**/*.ts",
+    "src/jules/**/*.ts",
+    "src/observability/**/*.ts",
+    "src/auth/principal.ts",
+    "src/auth/service-tokens.ts",
+    "src/auth/owner-login.ts",
+    "src/platform/config.ts",
+    "src/mcp/catalog.ts",
+    "src/mcp/results.ts",
+    "src/mcp/execute.ts"
+  ]
+}

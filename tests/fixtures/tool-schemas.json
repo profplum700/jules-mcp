@@ -1,0 +1,432 @@
+[
+  {
+    "name": "jules_list_sources",
+    "inputSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pageSize": {
+          "type": "integer",
+          "description": "One bounded page; default 20. Follow nextPageToken explicitly.",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "pageToken": {
+          "type": "string",
+          "description": "Opaque continuation token from this same list operation; do not edit it.",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "filter": {
+          "type": "string",
+          "description": "Documented Jules source filter (AIP-160). Passed as a query parameter, never as a URL.",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "detail": {
+          "type": "boolean",
+          "description": "Default false returns metadata with explicit omitted fields. True returns a bounded full page; use detail tools for large items."
+        }
+      },
+      "required": []
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "jules_get_source",
+    "inputSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "type": "string",
+          "description": "Exact sources/ID name or opaque source ID from Jules; nested github/owner/repo IDs are accepted.",
+          "minLength": 1,
+          "maxLength": 300
+        }
+      },
+      "required": [
+        "source"
+      ]
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "jules_resolve_repository",
+    "inputSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "repository": {
+          "type": "string",
+          "description": "owner/repo, exact GitHub HTTPS repository URL, canonical sources/ID, or opaque Jules source ID. Bare input is a source ID only, never a repository-name guess.",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "branch": {
+          "type": "string",
+          "description": "Explicit case-sensitive branch; preserved exactly.",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "pageToken": {
+          "type": "string",
+          "description": "Opaque continuation token from this same list operation; do not edit it.",
+          "minLength": 1,
+          "maxLength": 2048
+        }
+      },
+      "required": [
+        "repository"
+      ]
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "jules_create_session",
+    "inputSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "description": "Task instructions. Treated as user content, never operational logs.",
+          "minLength": 1,
+          "maxLength": 30000
+        },
+        "repository": {
+          "type": "string",
+          "description": "Exact owner/repo or exact HTTPS GitHub repository URL; never a fuzzy name.",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "source": {
+          "type": "string",
+          "description": "Exact sources/ID name or opaque source ID returned by Jules.",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "repositoryless": {
+          "type": "boolean",
+          "description": "Explicit true intentionally creates a task without repository context."
+        },
+        "branch": {
+          "type": "string",
+          "description": "Case-sensitive branch. Requires repository/source. Omit to use reported default.",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "title": {
+          "type": "string",
+          "description": "Optional upstream session title.",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "requirePlanApproval": {
+          "type": "boolean",
+          "description": "True requests Jules plan approval; omission preserves Jules automatic-approval default. No gateway approval queue."
+        },
+        "automationMode": {
+          "type": "string",
+          "description": "Optional documented automatic PR creation, not merging.",
+          "enum": [
+            "AUTO_CREATE_PR"
+          ]
+        }
+      },
+      "required": [
+        "prompt"
+      ]
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "jules_list_sessions",
+    "inputSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pageSize": {
+          "type": "integer",
+          "description": "One bounded page; default 20. Follow nextPageToken explicitly.",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "pageToken": {
+          "type": "string",
+          "description": "Opaque continuation token from this same list operation; do not edit it.",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "detail": {
+          "type": "boolean",
+          "description": "Default false returns metadata with explicit omitted fields. True returns a bounded full page; use detail tools for large items."
+        }
+      },
+      "required": []
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "jules_get_session",
+    "inputSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "session": {
+          "type": "string",
+          "description": "Canonical sessions/ID returned by Jules; not an MCP transport session identifier.",
+          "minLength": 1,
+          "maxLength": 300
+        }
+      },
+      "required": [
+        "session"
+      ]
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "jules_delete_session",
+    "inputSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "session": {
+          "type": "string",
+          "description": "Canonical sessions/ID returned by Jules; not an MCP transport session identifier.",
+          "minLength": 1,
+          "maxLength": 300
+        }
+      },
+      "required": [
+        "session"
+      ]
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": true,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "jules_send_message",
+    "inputSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "session": {
+          "type": "string",
+          "description": "Canonical sessions/ID returned by Jules; not an MCP transport session identifier.",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "prompt": {
+          "type": "string",
+          "description": "Message for Jules.",
+          "minLength": 1,
+          "maxLength": 30000
+        }
+      },
+      "required": [
+        "session",
+        "prompt"
+      ]
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "jules_approve_plan",
+    "inputSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "session": {
+          "type": "string",
+          "description": "Canonical sessions/ID returned by Jules; not an MCP transport session identifier.",
+          "minLength": 1,
+          "maxLength": 300
+        }
+      },
+      "required": [
+        "session"
+      ]
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "jules_list_activities",
+    "inputSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "session": {
+          "type": "string",
+          "description": "Canonical sessions/ID returned by Jules; not an MCP transport session identifier.",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "One bounded page; default 20. Follow nextPageToken explicitly.",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "pageToken": {
+          "type": "string",
+          "description": "Opaque continuation token from this same list operation; do not edit it.",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "detail": {
+          "type": "boolean",
+          "description": "Default false returns metadata with explicit omitted fields. True returns a bounded full page; use detail tools for large items."
+        },
+        "createTime": {
+          "type": "string",
+          "description": "Optional createTime timestamp shown in the official activity-list example; upstream support is experimental.",
+          "minLength": 1,
+          "maxLength": 64
+        }
+      },
+      "required": [
+        "session"
+      ]
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "jules_get_activity",
+    "inputSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "activity": {
+          "type": "string",
+          "description": "Exact sessions/ID/activities/ID from jules_list_activities.",
+          "minLength": 1,
+          "maxLength": 768
+        }
+      },
+      "required": [
+        "activity"
+      ]
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "jules_get_change_set",
+    "inputSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "activity": {
+          "type": "string",
+          "description": "Exact sessions/ID/activities/ID from jules_list_activities.",
+          "minLength": 1,
+          "maxLength": 768
+        },
+        "artifactIndex": {
+          "type": "integer",
+          "description": "Zero-based artifact index in the selected activity.",
+          "minimum": 0,
+          "maximum": 999
+        },
+        "offset": {
+          "type": "integer",
+          "description": "UTF-16 character offset from previous nextOffset; default zero.",
+          "minimum": 0,
+          "maximum": 10000000
+        },
+        "limit": {
+          "type": "integer",
+          "description": "Maximum patch characters, default 20000.",
+          "minimum": 1,
+          "maximum": 40000
+        },
+        "expectedSha256": {
+          "type": "string",
+          "description": "Optional prior patch digest. Rejects continuation if the patch changed.",
+          "minLength": 1,
+          "maxLength": 64
+        }
+      },
+      "required": [
+        "activity",
+        "artifactIndex"
+      ]
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "jules_gateway_info",
+    "inputSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {},
+      "required": []
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    }
+  }
+]

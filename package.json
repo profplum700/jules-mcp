@@ -1,0 +1,58 @@
+{
+  "name": "jules-mcp-gateway",
+  "version": "0.1.0-prototype",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Independent self-hostable remote Jules MCP gateway for Cloudflare Workers Free",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "packageManager": "pnpm@10.13.1",
+  "scripts": {
+    "test": "node scripts/run-core-tests.mjs",
+    "test:workers": "vitest run --config vitest.config.ts",
+    "typecheck": "tsc -p tsconfig.json && tsc -p tests/tsconfig.json",
+    "typecheck:core": "tsc -p tsconfig.core.json",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "node scripts/lint.mjs",
+    "schema:check": "node --experimental-strip-types scripts/check-schema.mjs",
+    "schema:update": "node --experimental-strip-types scripts/check-schema.mjs --write",
+    "scan": "node scripts/scan-public.mjs",
+    "dry-run": "wrangler deploy --dry-run --outdir dist/production && wrangler deploy --config wrangler.feasibility.jsonc --dry-run --outdir dist/feasibility",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm schema:check && pnpm test:workers && pnpm scan && pnpm dry-run",
+    "bootstrap": "node scripts/bootstrap-dependencies.mjs",
+    "deploy:config": "node scripts/render-deploy-config.mjs",
+    "smoke:readonly": "node scripts/smoke-readonly.mjs"
+  },
+  "dependencies": {
+    "@cloudflare/workers-oauth-provider": "0.10.3",
+    "@modelcontextprotocol/server": "2.0.0",
+    "@modelcontextprotocol/client": "2.0.0",
+    "@modelcontextprotocol/sdk": "1.30.0",
+    "agents": "0.23.0",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-plugin": "1.1.9",
+    "@cloudflare/workers-types": "5.20260914.1",
+    "@types/node": "22.15.30",
+    "@vitest/runner": "4.1.8",
+    "@vitest/snapshot": "4.1.8",
+    "prettier": "3.9.6",
+    "typescript": "6.0.3",
+    "vitest": "4.1.8",
+    "wrangler": "4.131.2",
+    "@babel/core": "8.0.5"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "workerd"
+    ],
+    "ignoredBuiltDependencies": [
+      "core-js-pure"
+    ]
+  }
+}
