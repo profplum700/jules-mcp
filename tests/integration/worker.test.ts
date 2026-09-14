@@ -2,6 +2,8 @@
 import { env } from 'cloudflare:workers';
 import { createExecutionContext, waitOnExecutionContext } from 'cloudflare:test';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { AuthorizationError } from '@cloudflare/workers-oauth-provider';
+import { GatewayError } from '../../src/shared/errors.ts';
 import worker from '../../src/index.ts';
 import diagnostic from '../../src/feasibility.ts';
 import { pkceChallenge, randomSecret, sha256 } from '../../src/shared/crypto.ts';
@@ -286,13 +288,30 @@ async function exchange(values: Record<string, string>) {
   });
 }
 describe('real maintained OAuth-provider integration with mocked GitHub identity', () => {
-  it('does not disguise authorization storage failures as invalid client input', async () => {
-    vi.spyOn(bindings.OAUTH_KV, 'get').mockRejectedValueOnce(new Error('synthetic-private-storage-error'));
-    const response = await dispatch('/authorize?client_id=synthetic-client');
-    expect(response.status).toBe(500);
-    const body = await response.text();
-    expect(JSON.parse(body).error.code).toBe('INTERNAL_ERROR');
-    expect(body).not.toContain('synthetic-private-storage-error');
+  it('preserves provider server failures, unexpected failures and existing gateway denials', async () => {
+    const failures = [
+      [
+        new AuthorizationError('server_error', { description: 'synthetic-private-detail' }),
+        500,
+        'INTERNAL_ERROR',
+      ],
+      [
+        new AuthorizationError('temporarily_unavailable', { description: 'synthetic-private-detail' }),
+        500,
+        'INTERNAL_ERROR',
+      ],
+      [new Error('synthetic-private-detail'), 500, 'INTERNAL_ERROR'],
+      [new GatewayError('OWNER_DENIED', 403), 403, 'OWNER_DENIED'],
+    ] as const;
+    const get = vi.spyOn(bindings.OAUTH_KV, 'get');
+    for (const [error, status, code] of failures) {
+      get.mockRejectedValueOnce(error);
+      const response = await dispatch('/authorize?client_id=synthetic-client');
+      expect(response.status).toBe(status);
+      const body = await response.text();
+      expect(JSON.parse(body).error.code).toBe(code);
+      expect(body).not.toContain('synthetic-private-detail');
+    }
   });
   it('rejects an unknown authorization client without an internal error or reflected input', async () => {
     const query = new URLSearchParams({
