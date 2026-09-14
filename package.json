@@ -37,12 +37,12 @@
   "devDependencies": {
     "@cloudflare/vitest-plugin": "1.1.9",
     "@cloudflare/workers-types": "5.20260914.1",
-    "@types/node": "22.15.30",
-    "@vitest/runner": "4.1.8",
-    "@vitest/snapshot": "4.1.8",
+    "@types/node": "26.5.1",
+    "@vitest/runner": "4.1.11",
+    "@vitest/snapshot": "5.0.0",
     "prettier": "3.9.6",
-    "typescript": "6.0.3",
-    "vitest": "4.1.8",
+    "typescript": "7.0.2",
+    "vitest": "5.0.0",
     "wrangler": "4.131.2",
     "@babel/core": "8.0.5"
   },
