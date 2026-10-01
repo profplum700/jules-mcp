@@ -2,6 +2,8 @@
 
 The project is an independent public, generic remote Jules MCP gateway. Preserve these boundaries.
 
+This file is the instruction file for Claude Code and Codex. Do not add a CLAUDE.md; Claude Code reads AGENTS.md directly.
+
 ## Exact commands
 
 - Offline core tests: `node scripts/run-core-tests.mjs`.
@@ -12,6 +14,7 @@ The project is an independent public, generic remote Jules MCP gateway. Preserve
 - Historical one-time dependency resolution: `pnpm bootstrap` (network required; review/commit resulting lockfile and formatting changes).
 - Reproducible install: `pnpm install --frozen-lockfile`.
 - Full gate: `pnpm check` (format, policy lint, full typecheck, offline tests, schema, Worker-runtime tests, secret scan, both dry runs).
+- Dependency audit (CI runs it after `pnpm check`): `pnpm audit --prod --audit-level=high`.
 - Schema update only after intentional review: `pnpm schema:update`; refresh client tool definitions.
 - Generate explicit private config: `pnpm deploy:config`.
 
@@ -32,3 +35,10 @@ Never claim a command passed without running it. Node tests are not Workerd test
 11. `src/feasibility.ts` is an isolated diagnostic deployment. It must never be imported into `src/index.ts` or advertised as production.
 
 The dependency blocker is resolved: use pnpm 10.13.1 and frozen installs. History scanning requires a full clone. Keep Wrangler JSONC files strict-JSON-compatible for the dependency-free renderer. See docs/implementation-status.md for live gates; local Workerd tests are not hosted-client verification.
+
+## Pull requests and merging
+
+- Branch from `main`, keep one focused change per PR, and include synthetic regression tests (see CONTRIBUTING.md).
+- Merge (squash) without asking once all CI checks pass and every review comment and review thread has been answered, including ones that arrive after later pushes. Answer each comment (fix it, or reply why not) before merging. Never merge red or conflicted PRs.
+- This is a deliberate merge by the agent working on the PR. It does not permit auto-merge workflows, merge bots or a merge MCP tool; boundaries 6 and 10 still apply.
+- Never print, log or commit secrets.
