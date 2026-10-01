@@ -36,15 +36,15 @@
   },
   "devDependencies": {
     "@cloudflare/vitest-plugin": "1.1.9",
-    "@cloudflare/workers-types": "5.20260914.1",
-    "@types/node": "22.15.30",
-    "@vitest/runner": "4.1.8",
+    "@cloudflare/workers-types": "5.20260928.1",
+    "@types/node": "26.6.3",
+    "@vitest/runner": "4.1.11",
     "@vitest/snapshot": "4.1.8",
-    "prettier": "3.9.6",
-    "typescript": "6.0.3",
+    "prettier": "3.9.9",
+    "typescript": "7.0.2",
     "vitest": "4.1.8",
-    "wrangler": "4.131.2",
-    "@babel/core": "8.0.5"
+    "wrangler": "4.142.0",
+    "@babel/core": "8.0.6"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
