@@ -27,12 +27,12 @@
     "smoke:readonly": "node scripts/smoke-readonly.mjs"
   },
   "dependencies": {
-    "@cloudflare/workers-oauth-provider": "0.10.3",
+    "@cloudflare/workers-oauth-provider": "1.2.4",
     "@modelcontextprotocol/server": "2.0.0",
     "@modelcontextprotocol/client": "2.0.0",
     "@modelcontextprotocol/sdk": "1.30.0",
     "agents": "0.23.0",
-    "zod": "4.6.5"
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@cloudflare/vitest-plugin": "1.1.9",
